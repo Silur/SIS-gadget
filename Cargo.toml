@@ -1,0 +1,29 @@
+[package]
+name = "sis_gadget"
+version = "0.0.1"
+edition = "2018"
+
+authors = [
+    "Alex Vlasov <alex.m.vlasov@gmail.com>"
+]
+
+[dependencies]
+
+ff_ce = { version = "0.6.0", features = ["derive"] }
+pairing_ce = { version = "0.17.0" }
+bellman_ce = { version = "0.3.0" }
+sapling-crypto_ce = {version = "0.0.5" }
+
+rand = "0.4"
+hex = "0.3.2"
+time = "0.1"
+num-bigint = "0.2"
+rust-crypto = "0.2"
+fnv = "1.0.3"
+rustc-hex = "2.0.1"
+digest = "0.7"
+byteorder = "1"
+tiny-keccak = "1.4.2"
+blake2-rfc_bellman_edition = "0.0.1"
+lazy_static = "1.2.0"
+
