@@ -6,3 +6,6 @@ extern crate rand;
 pub mod accumulator;
 pub mod params;
 pub mod circuit;
+
+pub use params::{BinarySISParams};
+pub use accumulator::{BinarySISAccumulator};

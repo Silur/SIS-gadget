@@ -8,10 +8,8 @@ use bellman::pairing::ff::{
     PrimeFieldRepr
 };
 
-use sapling_crypto::group_hash::{GroupHasher, Keccak256Hasher};
-
 use super::params::BinarySISParams;
-use std::collections::HashSet;
+// use std::collections::HashSet;
 
 /// This structure defines parameters for SIS accumulator that expects
 /// binary(!) string as input
@@ -49,18 +47,23 @@ impl<'a, E: Engine> BinarySISAccumulator<'a, E> {
     }
 
     // accumulates an element into the internal state and provides a witness
-    pub fn acculumate(&mut self, value: &[bool]) -> Vec<E::Fr> {
+    pub fn acculumate(&mut self, value: &[bool]) {
         assert!(value.len() == self.params.m as usize, "expected to acculumate binary string of specific size!");
-        let mut h = self.hash(value);
+        let h = self.hash(value);
         for (v, h) in self.accumulated_value.iter_mut().zip(h.iter()) {
             v.add_assign(&h);
         }
 
-        // witness is acculumated value + A(-e))
 
-        for el in h.iter_mut() {
-            el.negate();
+    }
+
+    pub fn calculate_witness(&self, value: &[bool]) -> Vec<E::Fr> {
+        let mut h = self.hash(value);
+        for (v, h) in self.accumulated_value.iter().zip(h.iter_mut()) {
+            h.negate();
+            h.add_assign(&v);
         }
+        // witness is acculumated value + A(-e))
 
         h
     }
@@ -109,6 +112,37 @@ impl<'a, E: Engine> BinarySISAccumulator<'a, E> {
             *g = tmp;
             g.mul_assign(&s);
             tmp = newtmp;
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use sapling_crypto::group_hash::{GroupHasher, Keccak256Hasher};
+    use bellman::pairing::bn256::Bn256;
+    use crate::{BinarySISAccumulator, BinarySISParams};
+    use rand::{Rng, Rand, thread_rng};
+    #[test]
+    fn test_accumulator() {
+        let n = 128u32;
+        let m = 32512u32;
+        let rng = &mut thread_rng();
+        let params = BinarySISParams::<Bn256>::new::<Keccak256Hasher>(b"hello", m, n);
+        let mut accumulator = BinarySISAccumulator::new(&params);
+        let mut values = vec![];
+        let mut witnesses = vec![];
+        for _ in 0..10 {
+            let value: Vec<bool> = (0..m).map(|_| rng.gen()).collect();
+            accumulator.acculumate(&value);
+            values.push(value);
+        }
+
+        for v in values.iter() {
+            witnesses.push(accumulator.calculate_witness(v));
+        }
+
+        for (w, v) in witnesses.iter().zip(values.iter()) {
+            assert!(accumulator.check_inclusion(v, w));
         }
     }
 }
