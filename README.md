@@ -8,7 +8,7 @@ In short lattice based one-way function may be formulated as the following (link
 - Let's take "high" seculity level and start to accululate individual elements `x` as the following:
   - Initial `acc` is zero vector of dimension `n`
   - Add element to the set: `acc += Ax`
-  - Witness: `w = A^{-1} *(acc - Ax)` with `|w| < beta_prime`, such that problem of finding witness for element inclusion becomes just another instance of the SIS problem with different security level that would be determined by the number "K" of elements accumulated. Imagine `x` being a bitstring of length `m` so that `|x| < beta`, then `w` would be a vector of length `m` with worst-case elements being `<= K` and `|x| < beta*K`
+  - Witness: `w = A^{-1} *(acc - Ax)` with `|w| < beta_prime`, such that problem of finding witness for element inclusion becomes just another instance of the SIS problem with different security level that would be determined by the number "K" of elements accumulated. Imagine `x` being a bitstring of length `m` so that `|x| < beta`, then `w` would be a vector of length `m` with worst-case elements being `<= K` and `|x| < beta*K`. It's obsiously easy to make a proper witness using the true content of accumulator by just summing up all other elements! Verification equation is just `A(w+x) == acc`
 - Such element is obviously R1CS friendly: we are in a prime field, with calculation of `Ax` taking `n` constraints (consider elements of `x` already constrained to be bits, so we can skip the check `|x| < beta`)
 - Witness check would take `n` constraints plus `2 + NUM_BITS` constraints to check `|w| < beta*K` if `beta*K` and squares of elements do not overflow a field modulus
 
