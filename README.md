@@ -12,6 +12,12 @@ In short lattice based one-way function may be formulated as the following (link
 - Such element is obviously R1CS friendly: we are in a prime field, with calculation of `Ax` taking `n` constraints (consider elements of `x` already constrained to be bits, so we can skip the check `|x| < beta`)
 - Witness check would take `n` constraints plus `2 + NUM_BITS` constraints to check `|w| < beta*K` if `beta*K` and squares of elements do not overflow a field modulus
 
+## Drawbacks
+
+- Not yet analyzed for correctness!!!!
+- It may be not possible to chose ideal set of parameters
+- It's not a "vector accumulator", but for some cases one can just keep numeration of elements in the set directly inside of the elements and guarantee such invariants by the circuit itself
+
 ## Disclaimer
 
 Such construction is largely is brainstorm effort and was initially proposed by `@Silur` with this explained prepared by `@shamatar`
