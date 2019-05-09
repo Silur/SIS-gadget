@@ -1,6 +1,6 @@
 # SIS (short integer solution) problem based zkSNARKs/STARKs friendly accumulator
 
-In short lattice based one-way function may be formulated as the following (links to original article to follow):
+In short lattice based one-way function may be formulated as the following (original [paper](https://cims.nyu.edu/~regev/papers/average.pdf)):
 
 - Choose prime (not necessary large) `q(n)`, random matrix `A` of size `m(n) x n`, such that there always exists an integer solution `Ax = z` with `|x| < beta(n)`, where `x` is vector of length `m` and `z` is a vector of length `n`. Such construction may be reduced to a SIS problem that is considered "hard"
 - One can reformulate a problem by limiting elements of `x` to be in range `[0, d)` for some `d(n)`, so `beta` can be calculated from `d` and `m`
