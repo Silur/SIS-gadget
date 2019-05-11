@@ -28,3 +28,9 @@ blake2-rfc_bellman_edition = "0.0.1"
 lazy_static = "1.2.0"
 bitvec = "0.10.2"
 
+[dev-dependencies]
+criterion = "0.2"
+
+[[bench]]
+name = "accumulator_benchmark"
+harness = false
