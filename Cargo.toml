@@ -26,4 +26,5 @@ byteorder = "1"
 tiny-keccak = "1.4.2"
 blake2-rfc_bellman_edition = "0.0.1"
 lazy_static = "1.2.0"
+bitvec = "0.10.2"
 

@@ -17,13 +17,18 @@ pub struct BinarySISParams<E: Engine> {
     pub m: u32,
     pub n: u32,
     pub a_matrix: Vec<E::Fr>,
+    pub capacity: usize,
+    pub(crate) element_norm_squared: E::Fr,
+    pub(crate) witness_element_squared: E::Fr,
+    pub(crate) witness_norm_squared: E::Fr
 }
 
 impl<E: Engine> BinarySISParams<E> {
     pub fn new<G: GroupHasher> (
         personalization: &[u8],
         m: u32, 
-        n: u32
+        n: u32,
+        capacity: usize,
     ) -> Self {
         let mut a_matrix = vec![E::Fr::zero(); (m as usize)*(n as usize)];
         {
@@ -57,11 +62,37 @@ impl<E: Engine> BinarySISParams<E> {
                 }
             }
 
+            // TODO: these are temporary, will be properly recalculated or hardcoded
+            let mut element_norm = E::Fr::one();
+            element_norm.mul_assign(&E::Fr::from_str(&m.to_string()).unwrap());
+
+            let mut witness_element_squared = E::Fr::one();
+            witness_element_squared.mul_assign(&E::Fr::from_str(&capacity.to_string()).unwrap());
+
+            let mut witness_norm = element_norm;
+            witness_norm.mul_assign(&E::Fr::from_str(&capacity.to_string()).unwrap());
+
+            assert!(element_norm.into_repr().num_bits() <= E::Fr::CAPACITY / 2 - Self::log_2(m as u32) - Self::log_2(capacity as u32));
+            assert!(witness_element_squared.into_repr().num_bits() <= E::Fr::CAPACITY / 2 - Self::log_2(capacity as u32));
+            assert!(witness_norm.into_repr().num_bits() <= E::Fr::CAPACITY / 2);
+
+            element_norm.square();
+            witness_element_squared.square();
+            witness_norm.square();
+
             Self {
                 m: m,
                 n: n,
-                a_matrix: a_matrix
+                a_matrix: a_matrix,
+                capacity: capacity,
+                element_norm_squared: element_norm,
+                witness_element_squared: witness_element_squared,
+                witness_norm_squared: witness_norm
             }
         }
+    }
+
+    fn log_2(value: u32) -> u32 {
+        return f64::from(value).log2().ceil() as u32
     }
 }
