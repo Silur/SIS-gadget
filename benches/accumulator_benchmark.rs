@@ -43,7 +43,41 @@ fn criterion_benchmark_hashing(c: &mut Criterion) {
     );
 }
 
+fn criterion_benchmark_accumulation(c: &mut Criterion) {
+    let mut accumulator = BinarySISAccumulator::new(&BN256_PARAMS);
+    let mut values = vec![];
+    let rng = &mut thread_rng();
+    for _ in 0..10 {
+        let value: Vec<bool> = (0..32512u32).map(|_| rng.gen()).collect();
+        values.push(value);
+    }
+    c.bench("accumulate 10", Benchmark::new("", move |b| b.iter(|| {
+        for v in values.iter() {
+            accumulator.acculumate(&v);
+        }
+    })).sample_size(10)
+    );
+}
+
+fn criterion_benchmark_witness_generation(c: &mut Criterion) {
+    let mut accumulator = BinarySISAccumulator::new(&BN256_PARAMS);
+    let mut values = vec![];
+    let rng = &mut thread_rng();
+    for _ in 0..1024 {
+        let value: Vec<bool> = (0..32512u32).map(|_| rng.gen()).collect();
+        accumulator.acculumate(&value[..]);
+        values.push(value);
+    }
+    c.bench("witness in 1024", Benchmark::new("", move |b| b.iter(|| {
+        accumulator.calculate_witness(&values[1023]);
+    })).sample_size(10)
+    );
+}
+
 criterion_group!(benches_generation, criterion_benchmark_generation);
-criterion_group!(benches_functionality, criterion_benchmark_hashing);
+criterion_group!(benches_functionality, 
+    criterion_benchmark_hashing, 
+    criterion_benchmark_accumulation,
+    criterion_benchmark_witness_generation);
 // criterion_main!(benches_generation);
 criterion_main!(benches_functionality);
